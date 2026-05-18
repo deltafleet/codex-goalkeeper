@@ -1,20 +1,22 @@
 {
-  "name": "@deltafleet/codex-goalkeeper",
-  "version": "0.1.1",
-  "description": "A small Codex skill for keeping long-running goals oriented across compaction, resumes, and handoffs.",
+  "name": "@deltafleet/goalkeeper",
+  "version": "0.2.0",
+  "description": "A small Agent Skill for keeping long-running goals oriented across compaction, resumes, and handoffs.",
   "license": "MIT",
   "type": "module",
-  "homepage": "https://github.com/deltafleet/codex-goalkeeper#readme",
+  "homepage": "https://github.com/deltafleet/goalkeeper#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/deltafleet/codex-goalkeeper.git"
+    "url": "git+https://github.com/deltafleet/goalkeeper.git"
   },
   "bugs": {
-    "url": "https://github.com/deltafleet/codex-goalkeeper/issues"
+    "url": "https://github.com/deltafleet/goalkeeper/issues"
   },
   "keywords": [
+    "agent-skills",
+    "claude-code",
+    "claude-skill",
     "codex",
-    "codex-skill",
     "ai-agents",
     "context",
     "compaction",
@@ -22,14 +24,19 @@
     "goal"
   ],
   "bin": {
-    "codex-goalkeeper-init": "src/codex-goalkeeper/scripts/goalkeeper-init.mjs",
-    "codex-goalkeeper-turn-start": "src/codex-goalkeeper/scripts/goalkeeper-turn-start.mjs",
-    "codex-goalkeeper-append-event": "src/codex-goalkeeper/scripts/goalkeeper-append-event.mjs",
-    "codex-goalkeeper-update-checkpoint": "src/codex-goalkeeper/scripts/goalkeeper-update-checkpoint.mjs",
-    "codex-goalkeeper-doctor": "src/codex-goalkeeper/scripts/goalkeeper-doctor.mjs"
+    "goalkeeper-init": "src/goalkeeper/scripts/goalkeeper-init.mjs",
+    "goalkeeper-turn-start": "src/goalkeeper/scripts/goalkeeper-turn-start.mjs",
+    "goalkeeper-append-event": "src/goalkeeper/scripts/goalkeeper-append-event.mjs",
+    "goalkeeper-update-checkpoint": "src/goalkeeper/scripts/goalkeeper-update-checkpoint.mjs",
+    "goalkeeper-doctor": "src/goalkeeper/scripts/goalkeeper-doctor.mjs",
+    "codex-goalkeeper-init": "src/goalkeeper/scripts/goalkeeper-init.mjs",
+    "codex-goalkeeper-turn-start": "src/goalkeeper/scripts/goalkeeper-turn-start.mjs",
+    "codex-goalkeeper-append-event": "src/goalkeeper/scripts/goalkeeper-append-event.mjs",
+    "codex-goalkeeper-update-checkpoint": "src/goalkeeper/scripts/goalkeeper-update-checkpoint.mjs",
+    "codex-goalkeeper-doctor": "src/goalkeeper/scripts/goalkeeper-doctor.mjs"
   },
   "files": [
-    "src/codex-goalkeeper",
+    "src/goalkeeper",
     "examples",
     "docs",
     "README.md",
@@ -43,7 +50,7 @@
     "CODE_OF_CONDUCT.md"
   ],
   "scripts": {
-    "check:scripts": "find src/codex-goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check",
+    "check:scripts": "find src/goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check",
     "test": "node tests/test-goalkeeper-update-checkpoint.mjs",
     "validate:skill": "npx skills add . --list",
     "validate:examples": "find examples -name '*.jsonl' -print0 | xargs -0 -n1 jq -c . >/dev/null",

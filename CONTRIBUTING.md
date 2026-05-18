@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for considering a contribution to Codex Goalkeeper.
+Thanks for considering a contribution to Goalkeeper.
 
 The project has one strong bias: keep the core small enough that agents will actually use it during long work.
 
@@ -16,7 +16,7 @@ The project has one strong bias: keep the core small enough that agents will act
 
 - New persistent state beyond `.goalkeeper/`.
 - Background processes.
-- Runtime hooks into private Codex internals.
+- Runtime hooks into private host-agent internals.
 - Global databases or cross-project indexing.
 - Large abstractions around the five core helper scripts.
 
@@ -33,8 +33,8 @@ npm run validate
 Manual equivalent:
 
 ```bash
-find src/scripts -name '*.mjs' -print0 | xargs -0 -n1 node --check
-node src/scripts/test-goalkeeper-update-checkpoint.mjs
+find src/goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check
+node tests/test-goalkeeper-update-checkpoint.mjs
 find examples -name '*.jsonl' -print0 | xargs -0 -n1 jq -c . >/dev/null
 npx skills add . --list
 ```

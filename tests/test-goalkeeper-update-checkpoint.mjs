@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(SCRIPT_DIR, "..");
-const SKILL_ROOT = path.join(REPO_ROOT, "src", "codex-goalkeeper");
+const SKILL_ROOT = path.join(REPO_ROOT, "src", "goalkeeper");
 const TMP_ROOT = path.join(REPO_ROOT, ".goalkeeper", "tmp", "checkpoint-update");
 const WORKSPACE = path.join(TMP_ROOT, "workspace");
 const SESSION_ID = "checkpoint-update-poc";
@@ -131,6 +131,41 @@ function main() {
     "--json",
   ]);
   assert(appendToSchemaInvalid.status === 1, "append should refuse an existing schema-invalid event log");
+
+  const claudeGuardrailWorkspace = path.join(TMP_ROOT, "claude-guardrail-workspace");
+  fs.mkdirSync(claudeGuardrailWorkspace, { recursive: true });
+  fs.writeFileSync(
+    path.join(claudeGuardrailWorkspace, "CLAUDE.md"),
+    [
+      "# Goalkeeper Guardrail",
+      "",
+      "At the start of each new assistant turn, before source work, read .goalkeeper/sessions/<goal-session-id>/checkpoint.md.",
+      "This checkpoint-first rule applies after compaction, compact, start, resume, and before normal project work.",
+      "",
+    ].join("\n"),
+  );
+  const claudeInit = run([
+    script("goalkeeper-init.mjs"),
+    "--workspace",
+    claudeGuardrailWorkspace,
+    "--session",
+    SESSION_ID,
+    "--goal",
+    "Validate CLAUDE.md guardrail support.",
+    "--json",
+  ]);
+  assert(claudeInit.status === 0, `claude init failed:\n${claudeInit.stderr}\n${claudeInit.stdout}`);
+  const claudeDoctor = run([
+    script("goalkeeper-doctor.mjs"),
+    "--workspace",
+    claudeGuardrailWorkspace,
+    "--session",
+    SESSION_ID,
+    "--strict",
+    "--json",
+  ]);
+  assert(claudeDoctor.status === 0, `CLAUDE.md doctor failed:\n${claudeDoctor.stderr}\n${claudeDoctor.stdout}`);
+  assert(JSON.parse(claudeDoctor.stdout).ok === true, "doctor should accept a CLAUDE.md-only guardrail");
 
   const update = run([
     script("goalkeeper-update-checkpoint.mjs"),

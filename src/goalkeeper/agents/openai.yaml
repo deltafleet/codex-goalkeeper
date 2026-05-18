@@ -1,0 +1,5 @@
+interface:
+  display_name: "Goalkeeper"
+  short_description: "Keep long goals oriented"
+  default_prompt: "Use $goalkeeper for this long-running goal so checkpoint, context pack, and event log preserve direction across compaction."
+  brand_color: "#2563EB"

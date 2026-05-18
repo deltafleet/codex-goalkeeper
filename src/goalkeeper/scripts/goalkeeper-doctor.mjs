@@ -30,7 +30,7 @@ const CONTEXT_PACK_MAX_BYTES = 60_000;
 const USAGE = `Usage:
   node scripts/goalkeeper-doctor.mjs --session <goal-session-id> [--workspace <path>] [--strict] [--json]
 
-Checks whether a target workspace has enough Goalkeeper state and guardrails for long-running Codex goal work.
+Checks whether a target workspace has enough Goalkeeper state and guardrails for long-running agent goal work.
 This script is read-only.
 `;
 
@@ -173,27 +173,41 @@ function listSessionDirs(sessionsRoot) {
   }
 }
 
-function guardrailStatus(agentsPath, strict) {
-  if (!fileExists(agentsPath)) {
-    return check(strict ? "fail" : "warn", "agents_guardrail", "AGENTS.md is missing.", { path: agentsPath });
+function guardrailStatus(workspace, strict) {
+  const candidates = [
+    { name: "AGENTS.md", path: path.join(workspace, "AGENTS.md") },
+    { name: "CLAUDE.md", path: path.join(workspace, "CLAUDE.md") },
+  ];
+  const existing = candidates.filter((candidate) => fileExists(candidate.path));
+
+  if (existing.length === 0) {
+    return check(strict ? "fail" : "warn", "project_guardrail", "AGENTS.md or CLAUDE.md is missing.", {
+      paths: candidates.map((candidate) => candidate.path),
+    });
   }
 
-  const text = fs.readFileSync(agentsPath, "utf8");
-  const hasGoalkeeperPath = text.includes(".goalkeeper/sessions");
-  const hasCheckpoint = text.includes("checkpoint");
-  const hasFirstActionLanguage = /start|before|first|resume|compaction|compact/i.test(text);
+  const inspected = existing.map((candidate) => {
+    const text = fs.readFileSync(candidate.path, "utf8");
+    return {
+      ...candidate,
+      hasGoalkeeperPath: text.includes(".goalkeeper/sessions"),
+      hasCheckpoint: text.includes("checkpoint"),
+      hasFirstActionLanguage: /start|before|first|resume|compaction|compact/i.test(text),
+    };
+  });
+  const passing = inspected.find((candidate) => candidate.hasGoalkeeperPath && candidate.hasCheckpoint && candidate.hasFirstActionLanguage);
 
-  if (hasGoalkeeperPath && hasCheckpoint && hasFirstActionLanguage) {
-    return check("pass", "agents_guardrail", "AGENTS.md contains a Goalkeeper checkpoint-first guardrail.", {
-      path: agentsPath,
+  if (passing) {
+    return check("pass", "project_guardrail", `${passing.name} contains a Goalkeeper checkpoint-first guardrail.`, {
+      path: passing.path,
     });
   }
 
   return check(
     strict ? "fail" : "warn",
-    "agents_guardrail",
-    "AGENTS.md exists but does not clearly contain the Goalkeeper checkpoint-first guardrail.",
-    { path: agentsPath },
+    "project_guardrail",
+    "AGENTS.md or CLAUDE.md exists but does not clearly contain the Goalkeeper checkpoint-first guardrail.",
+    { paths: inspected.map((candidate) => candidate.path) },
   );
 }
 
@@ -239,7 +253,6 @@ function inspectWorkspace(options) {
   const checkpointPath = path.join(sessionDir, "checkpoint.md");
   const contextPackPath = path.join(sessionDir, "context-pack.md");
   const eventsPath = path.join(sessionDir, "events.jsonl");
-  const agentsPath = path.join(workspace, "AGENTS.md");
   const checks = [];
 
   checks.push(
@@ -395,7 +408,7 @@ function inspectWorkspace(options) {
     }
   }
 
-  checks.push(guardrailStatus(agentsPath, options.strict));
+  checks.push(guardrailStatus(workspace, options.strict));
 
   if (fileExists(checkpointPath)) {
     checks.push(runTurnStart(workspace, options.sessionId));
@@ -432,6 +445,7 @@ function printText(result) {
   for (const item of result.checks) {
     console.log(`- ${item.status.toUpperCase()} ${item.name}: ${item.message}`);
     if (item.details?.path) console.log(`  path: ${item.details.path}`);
+    if (item.details?.paths) console.log(`  paths: ${item.details.paths.join(", ")}`);
     if (item.details?.sessionId) console.log(`  session id: ${item.details.sessionId}`);
     if (item.details?.bytes !== undefined) console.log(`  bytes: ${item.details.bytes}`);
     if (item.details?.records !== undefined) console.log(`  records: ${item.details.records}`);

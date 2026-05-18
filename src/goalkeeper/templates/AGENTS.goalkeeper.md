@@ -1,6 +1,6 @@
 # Goalkeeper Guardrail
 
-When this repository has an active `.goalkeeper/sessions/<goal-session-id>/` directory, treat it as the continuity source for long-running Codex work.
+When this repository has an active `.goalkeeper/sessions/<goal-session-id>/` directory, treat it as the continuity source for long-running agent work.
 
 At the start of each new assistant turn, before reading normal project files or making edits:
 

@@ -2,13 +2,13 @@
 
 ## Product Thesis
 
-Long-running Codex goals need a small continuity layer outside the model context.
+Long-running agent goals need a small continuity layer outside the model context.
 
 Goalkeeper should stay boring: a short checkpoint, a medium-density context pack, an append-only event log, a turn-start helper, and a doctor check. It should not become a substitute context engine or a promise of perfect post-compact recovery.
 
 ## MVP
 
-Ship a Codex skill under `src/codex-goalkeeper/` that manages project-local state:
+Ship an agent skill under `src/goalkeeper/` that manages project-local state:
 
 ```text
 .goalkeeper/
@@ -46,16 +46,16 @@ Keep this optional and maintainer-oriented:
 ## Non-Goals
 
 - no MCP server in the MVP
-- no Codex plugin packaging in the MVP
+- no host-agent plugin packaging in the MVP
 - no SQLite or global database
 - no background daemon
 - no prompt-assembly hook
-- no Codex session rewriting
+- no host-agent session rewriting
 - no claim of 100 percent compact recovery
 
 ## Good Enough Release Bar
 
-- `npx skills add . --list` discovers exactly one skill named `codex-goalkeeper`
+- `npx skills add . --list` discovers exactly one skill named `goalkeeper`
 - the skill body is concise enough to load routinely
 - README explains the simple workflow clearly
 - multilingual READMEs keep the same public workflow in Korean, Japanese, and Chinese

@@ -6,7 +6,7 @@ import path from "node:path";
 const USAGE = `Usage:
   node scripts/goalkeeper-turn-start.mjs [--session <goal-session-id>] [--workspace <path>] [--events <n>] [--context] [--json]
 
-Reads the active Goalkeeper checkpoint at the start of a Codex turn.
+Reads the active Goalkeeper checkpoint at the start of an agent turn.
 This script reads only .goalkeeper state.
 `;
 

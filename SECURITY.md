@@ -26,7 +26,7 @@ Goalkeeper stores state in project-local `.goalkeeper/` directories. It should n
 - secret tokens
 - background daemons
 - network access for normal helper scripts
-- private Codex runtime hooks
+- private host-agent runtime hooks
 - global databases
 
 If a change introduces any of those, treat it as security-sensitive and document the reason clearly.

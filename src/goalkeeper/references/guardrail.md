@@ -1,20 +1,22 @@
 # Goalkeeper Guardrail
 
-The skill body is not enough to guarantee checkpoint-first behavior after compaction. Codex may resume from a compacted summary without the model noticing the exact session-log marker.
+The skill body is not enough to guarantee checkpoint-first behavior after compaction. A host agent may resume from a compacted summary without the model noticing the exact session-log marker.
 
-For high-stakes long-running work, add the AGENTS guardrail template to the target workspace:
+For high-stakes long-running work, add a guardrail template to the target workspace:
 
 ```text
 templates/AGENTS.goalkeeper.md
+templates/CLAUDE.goalkeeper.md
 ```
 
 Use it in one of these ways:
 
-- Copy the whole template into the target repository's `AGENTS.md`.
-- Merge the checkpoint-first section into an existing `AGENTS.md`.
-- Keep the template as project documentation and explicitly ask Codex to follow it before starting a long goal.
+- Copy `templates/AGENTS.goalkeeper.md` into the target repository's `AGENTS.md` for Codex-style agents.
+- Copy `templates/CLAUDE.goalkeeper.md` into the target repository's `CLAUDE.md` for Claude Code.
+- Merge the checkpoint-first section into an existing `AGENTS.md` or `CLAUDE.md`.
+- Keep the template as project documentation and explicitly ask the agent to follow it before starting a long goal.
 
-The guardrail is still skill-first. It does not require a plugin, MCP server, database, or private Codex runtime hook. It uses a surface Codex already honors: repository instructions.
+The guardrail is still skill-first. It does not require a plugin, MCP server, database, or private runtime hook. It uses surfaces coding agents already honor: repository instructions.
 
 ## Why This Matters
 

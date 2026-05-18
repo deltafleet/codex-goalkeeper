@@ -1,6 +1,6 @@
-# Codex Goalkeeper
+# Goalkeeper
 
-長い Codex 作業は、たいてい一気に壊れるわけではありません。
+長い agent 作業は、たいてい一気に壊れるわけではありません。
 
 少しずつ方向を失います。
 
@@ -8,7 +8,7 @@
 
 > なぜ、この方針で進んでいたのか？
 
-Codex Goalkeeper は、長い `/goal` 作業が compaction、resume、handoff をまたいでも方向を保てるようにする小さな skill です。
+Goalkeeper は、長い `/goal` 作業が compaction、resume、handoff をまたいでも方向を保てるようにする小さな skill です。
 
 隠れたメモリエンジンを追加するものではありません。エージェントに耐久性のある作業習慣を与えます。
 
@@ -24,24 +24,30 @@ Codex Goalkeeper は、長い `/goal` 作業が compaction、resume、handoff �
 ## インストール
 
 ```bash
-npx skills add deltafleet/codex-goalkeeper
+npx skills add deltafleet/goalkeeper
 ```
 
-要件: Node.js 18+ と `npx`。長い goal workflow で、Codex は skill に同梱された Node helper script を使います。
+特定の agent を明示する場合:
 
-Codex は、リクエストが metadata と強く一致する installed skill を自動で読み込むことがあります。Goalkeeper の metadata は `/goal`、長い作業、compaction、resume、handoff、continuity preservation に反応するように書かれています。
+```bash
+npx skills add deltafleet/goalkeeper --agent claude-code codex
+```
+
+要件: Node.js 18+ と `npx`。長い goal workflow で、agent は skill に同梱された Node helper script を使います。
+
+Skill-compatible agent は、リクエストが metadata と強く一致する installed skill を自動で読み込むことがあります。Goalkeeper の metadata は `/goal`、長い作業、compaction、resume、handoff、continuity preservation に反応するように書かれています。
 
 そのため、次のような goal だけで有効になることがあります。
 
 > `/goal` Harden this release over a long-running session. Keep the goal, constraints, rejected paths, failed attempts, verification state, and next action recoverable after compact/resume.
 
-ただし skill activation は routing decision であり、private Codex runtime hook ではありません。Goalkeeper がすべての goal に強制的に自分を適用することはできません。
+ただし skill activation は routing decision であり、private agent runtime hook ではありません。Goalkeeper がすべての goal に強制的に自分を適用することはできません。
 
 重要な長期作業では、goal を作る時点、または goal 作成直後で本格作業に入る前に、明示的に呼び出すのがもっとも安全です。
 
-> Use codex-goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
+> Use goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
 
-その後、ユーザーが Goalkeeper の helper script を手で実行する必要はありません。Codex が skill workflow の一部として実行します。
+その後、ユーザーが Goalkeeper の helper script を手で実行する必要はありません。agent が skill workflow の一部として実行します。
 
 ## 問題
 
@@ -51,11 +57,11 @@ Codex は、リクエストが metadata と強く一致する installed skill �
 
 実際のセッションを想像してください。
 
-1. Codex にリリース hardening を任せます。
+1. agent にリリース hardening を任せます。
 2. いちばん分かりやすい patch は目の前の bug を直しますが、rollback compatibility を壊す可能性があります。
 3. ユーザーは強い制約を置きます。database schema は変更せず、backward compatibility を維持する。
 4. 2 回目の試行は unit test を通りますが、integration edge case で失敗します。
-5. Codex は compatibility shim と targeted regression test の組み合わせに決めます。
+5. agent は compatibility shim と targeted regression test の組み合わせに決めます。
 6. regression test が通ります。このルートが安全なルートになります。
 7. コンテキストが compact されます。
 8. 後でエージェントは「release hardening はほぼ完了」というきれいな要約で戻ってきます。
@@ -76,9 +82,9 @@ Codex は、リクエストが metadata と強く一致する installed skill �
 
 Goalkeeper は「goal は残っているが、セッションの方向感覚が弱くなった」その隙間を埋めるためのものです。
 
-## Codex がすること
+## Agent がすること
 
-skill が有効になると、Codex はプロジェクト内に継続性フォルダを維持します。
+skill が有効になると、agent はプロジェクト内に継続性フォルダを維持します。
 
 ```text
 .goalkeeper/
@@ -96,7 +102,7 @@ skill が有効になると、Codex はプロジェクト内に継続性フォ�
 - `context-pack.md`: checkpoint には長すぎるが compaction 後も残すべき判断理由
 - `events.jsonl`: 決定、失敗した試行、コマンド根拠、検証、リスク、handoff の記録
 
-Codex の active goal が目的地なら、Goalkeeper はなぜこのルートがまだ正しいのかを保ちます。
+active goal が目的地なら、Goalkeeper はなぜこのルートがまだ正しいのかを保ちます。
 
 ## 仕組み
 
@@ -104,13 +110,13 @@ Goalkeeper は長いエージェント作業を単純なループにします。
 
 ```text
 長い /goal が始まる
-  -> Codex が Goalkeeper セッションを作成または再開する
+  -> agent が Goalkeeper セッションを作成または再開する
   -> 重要な制約と決定を記録する
   -> 失敗した試行を残し、同じ失敗を繰り返さないようにする
   -> 信頼度が変わる検証根拠を残す
   -> 意味のある境界で checkpoint.md を更新する
   -> context-pack.md が深い判断理由を保つ
-  -> resume、handoff、compaction が疑われる後、Codex は checkpoint.md を最初に読む
+  -> resume、handoff、compaction が疑われる後、agent は checkpoint.md を最初に読む
   -> checkpoint が薄ければ context-pack.md を読む
   -> 正確な証拠が必要なら events.jsonl または source file を確認する
 ```
@@ -130,15 +136,15 @@ Goalkeeper は長いエージェント作業を単純なループにします。
 
 Goalkeeper は意図的にその方向を避けます。
 
-ファイルを使う理由は、見える、レビューできる、移動しやすい、そして compaction 後にエージェントが読み返しやすいからです。目的は Codex を全知にすることではありません。次の turn を正しい状態から始めることです。
+ファイルを使う理由は、見える、レビューできる、移動しやすい、そして compaction 後にエージェントが読み返しやすいからです。目的は agent を全知にすることではありません。次の turn を正しい状態から始めることです。
 
 ## これは何ではないか
 
-- Codex plugin ではありません。
+- Codex または Claude Code plugin ではありません。
 - MCP server ではありません。
 - database ではありません。
 - 完全な会話 transcript の保存庫ではありません。
-- private Codex runtime hook ではありません。
+- private agent runtime hook ではありません。
 - 完璧な記憶を保証しません。
 - compaction の頻度を下げません。
 
@@ -160,7 +166,7 @@ Goalkeeper を使うと、再開されたセッションが次を復旧できる
 ## リポジトリ構成
 
 ```text
-src/codex-goalkeeper/       # installable skill payload
+src/goalkeeper/       # installable skill payload
   SKILL.md
   agents/openai.yaml
   scripts/
@@ -182,7 +188,7 @@ npm run validate
 手動では次を実行します。
 
 ```bash
-find src/codex-goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check
+find src/goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check
 node tests/test-goalkeeper-update-checkpoint.mjs
 npx skills add . --list
 ```

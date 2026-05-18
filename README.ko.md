@@ -1,6 +1,6 @@
-# Codex Goalkeeper
+# Goalkeeper
 
-긴 Codex 작업은 보통 한 번에 망가지지 않습니다.
+긴 agent 작업은 보통 한 번에 망가지지 않습니다.
 
 조금씩 방향을 잃습니다.
 
@@ -8,7 +8,7 @@
 
 > 우리가 왜 이 방향으로 가고 있었지?
 
-Codex Goalkeeper는 긴 `/goal` 작업이 compact, resume, handoff를 지나도 방향을 잃지 않도록 돕는 작은 skill입니다.
+Goalkeeper는 긴 `/goal` 작업이 compact, resume, handoff를 지나도 방향을 잃지 않도록 돕는 작은 skill입니다.
 
 숨겨진 메모리 엔진을 추가하지 않습니다. 대신 에이전트에게 지속 가능한 작업 습관을 줍니다.
 
@@ -24,24 +24,30 @@ Codex Goalkeeper는 긴 `/goal` 작업이 compact, resume, handoff를 지나도 
 ## 설치
 
 ```bash
-npx skills add deltafleet/codex-goalkeeper
+npx skills add deltafleet/goalkeeper
 ```
 
-요구사항: Node.js 18+와 `npx`. 긴 goal workflow에서 Codex가 skill에 포함된 Node helper script를 사용합니다.
+특정 agent를 명시하려면 다음처럼 설치할 수 있습니다.
 
-Codex는 설치된 skill 중 요청과 관련성이 높은 skill을 자동으로 불러올 수 있습니다. Goalkeeper의 metadata는 `/goal`, 긴 작업, compact, resume, handoff, continuity 보존 신호에 반응하도록 작성되어 있습니다.
+```bash
+npx skills add deltafleet/goalkeeper --agent claude-code codex
+```
+
+요구사항: Node.js 18+와 `npx`. 긴 goal workflow에서 agent가 skill에 포함된 Node helper script를 사용합니다.
+
+Skill-compatible agent는 설치된 skill 중 요청과 관련성이 높은 skill을 자동으로 불러올 수 있습니다. Goalkeeper의 metadata는 `/goal`, 긴 작업, compact, resume, handoff, continuity 보존 신호에 반응하도록 작성되어 있습니다.
 
 그래서 아래처럼 goal 자체가 충분히 분명하면 자동으로 붙을 수 있습니다.
 
 > `/goal` 이번 릴리스를 장기 세션으로 안정화해줘. compact/resume 이후에도 목표, 제약, 거부한 경로, 실패한 시도, 검증 상태, 다음 액션이 복구 가능하게 관리해줘.
 
-하지만 skill 활성화는 Codex runtime hook이 아니라 routing 판단입니다. Goalkeeper가 모든 goal에 자신을 강제로 붙일 수는 없습니다.
+하지만 skill 활성화는 agent runtime hook이 아니라 routing 판단입니다. Goalkeeper가 모든 goal에 자신을 강제로 붙일 수는 없습니다.
 
 중요한 장기 작업이라면 goal을 만들 때, 또는 goal을 만든 직후 본격 작업 전에 명시적으로 호출하는 편이 가장 안전합니다.
 
-> 이 `/goal`에는 codex-goalkeeper를 사용해줘. 목표, 제약, 결정, 검증 상태, 실패한 시도, 다음 액션이 compact 이후에도 복구 가능하게 관리해줘.
+> 이 `/goal`에는 goalkeeper를 사용해줘. 목표, 제약, 결정, 검증 상태, 실패한 시도, 다음 액션이 compact 이후에도 복구 가능하게 관리해줘.
 
-그 다음부터 사용자가 Goalkeeper의 helper script를 직접 실행할 필요는 없습니다. Codex가 skill workflow의 일부로 실행합니다.
+그 다음부터 사용자가 Goalkeeper의 helper script를 직접 실행할 필요는 없습니다. agent가 skill workflow의 일부로 실행합니다.
 
 ## 문제
 
@@ -51,11 +57,11 @@ Codex는 설치된 skill 중 요청과 관련성이 높은 skill을 자동으로
 
 실제 세션을 상상해보면 이렇습니다.
 
-1. Codex에게 릴리스 hardening을 맡깁니다.
+1. agent에게 릴리스 hardening을 맡깁니다.
 2. 가장 쉬운 patch는 눈앞의 bug는 고치지만 rollback compatibility를 깨뜨릴 수 있습니다.
 3. 사용자는 강한 제약을 둡니다. database schema는 바꾸지 말고, backward compatibility를 유지해야 합니다.
 4. 두 번째 시도는 unit test를 통과하지만 integration edge case에서 실패합니다.
-5. Codex는 compatibility shim과 targeted regression test 조합으로 방향을 정합니다.
+5. agent는 compatibility shim과 targeted regression test 조합으로 방향을 정합니다.
 6. regression test가 통과합니다. 이제 이 경로가 안전한 경로입니다.
 7. 컨텍스트가 compact됩니다.
 8. 나중에 에이전트는 “release hardening은 거의 됨” 같은 깔끔한 요약으로 돌아옵니다.
@@ -76,9 +82,9 @@ Codex는 설치된 skill 중 요청과 관련성이 높은 skill을 자동으로
 
 Goalkeeper는 “goal은 남아 있지만 세션의 방향 감각은 약해진” 그 틈을 메우기 위한 도구입니다.
 
-## Codex가 하는 일
+## Agent가 하는 일
 
-skill이 활성화되면 Codex는 프로젝트 안에 연속성 폴더를 유지합니다.
+skill이 활성화되면 agent는 프로젝트 안에 연속성 폴더를 유지합니다.
 
 ```text
 .goalkeeper/
@@ -96,7 +102,7 @@ skill이 활성화되면 Codex는 프로젝트 안에 연속성 폴더를 유지
 - `context-pack.md`: checkpoint에는 너무 길지만 compact 이후에도 살아남아야 하는 판단 근거
 - `events.jsonl`: 결정, 실패한 시도, 명령 근거, 검증, 리스크, handoff 기록
 
-Codex의 active goal이 목적지를 말한다면, Goalkeeper는 왜 이 경로가 아직 맞는지를 보존합니다.
+active goal이 목적지를 말한다면, Goalkeeper는 왜 이 경로가 아직 맞는지를 보존합니다.
 
 ## 동작 원리
 
@@ -104,13 +110,13 @@ Goalkeeper는 긴 에이전트 작업을 단순한 루프로 바꿉니다.
 
 ```text
 긴 /goal이 시작된다
-  -> Codex가 Goalkeeper 세션을 만들거나 재개한다
+  -> agent가 Goalkeeper 세션을 만들거나 재개한다
   -> 중요한 제약과 결정을 기록한다
   -> 실패한 시도를 남겨 같은 삽질을 반복하지 않게 한다
   -> 신뢰도가 바뀌는 검증 근거를 남긴다
   -> 의미 있는 경계마다 checkpoint.md를 갱신한다
   -> context-pack.md가 더 깊은 판단 근거를 보존한다
-  -> resume, handoff, compact 의심 이후 Codex는 checkpoint.md를 먼저 읽는다
+  -> resume, handoff, compact 의심 이후 agent는 checkpoint.md를 먼저 읽는다
   -> checkpoint가 얇으면 context-pack.md를 읽는다
   -> 정확한 증거가 필요하면 events.jsonl이나 source file을 확인한다
 ```
@@ -130,15 +136,15 @@ Goalkeeper는 긴 에이전트 작업을 단순한 루프로 바꿉니다.
 
 Goalkeeper는 의도적으로 그 방향을 피합니다.
 
-파일을 쓰는 이유는 파일이 보이고, 검토 가능하고, 옮기기 쉽고, compact 이후에도 에이전트가 다시 읽기 쉽기 때문입니다. 목표는 Codex를 전지전능하게 만드는 것이 아닙니다. 다음 turn이 올바른 상태에서 시작하게 만드는 것입니다.
+파일을 쓰는 이유는 파일이 보이고, 검토 가능하고, 옮기기 쉽고, compact 이후에도 에이전트가 다시 읽기 쉽기 때문입니다. 목표는 agent를 전지전능하게 만드는 것이 아닙니다. 다음 turn이 올바른 상태에서 시작하게 만드는 것입니다.
 
 ## 이것이 아닌 것
 
-- Codex plugin이 아닙니다.
+- Codex 또는 Claude Code plugin이 아닙니다.
 - MCP server가 아닙니다.
 - 데이터베이스가 아닙니다.
 - 전체 대화 transcript 저장소가 아닙니다.
-- private Codex runtime hook이 아닙니다.
+- private agent runtime hook이 아닙니다.
 - 완벽한 기억을 보장하지 않습니다.
 - compact 빈도를 줄이지 않습니다.
 
@@ -160,7 +166,7 @@ Goalkeeper를 쓰면 resume된 세션이 다음을 복구할 가능성이 높아
 ## 저장소 구조
 
 ```text
-src/codex-goalkeeper/       # installable skill payload
+src/goalkeeper/       # installable skill payload
   SKILL.md
   agents/openai.yaml
   scripts/
@@ -182,7 +188,7 @@ npm run validate
 수동으로는 다음을 실행합니다.
 
 ```bash
-find src/codex-goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check
+find src/goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check
 node tests/test-goalkeeper-update-checkpoint.mjs
 npx skills add . --list
 ```

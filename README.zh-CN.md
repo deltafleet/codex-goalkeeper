@@ -1,6 +1,6 @@
-# Codex Goalkeeper
+# Goalkeeper
 
-长时间 Codex 任务通常不是突然失败的。
+长时间 agent 任务通常不是突然失败的。
 
 它们会慢慢偏离方向。
 
@@ -8,7 +8,7 @@ Agent 仍然会显得很自信。测试仍然会运行。计划看起来也仍�
 
 > 我们为什么要按这个方向做？
 
-Codex Goalkeeper 是一个很小的 skill，用来帮助 Codex 在长时间 `/goal` 工作中跨越 compaction、resume 和 handoff 仍然保持方向。
+Goalkeeper 是一个很小的 skill，用来帮助 Claude Code、Codex 以及其他 skill-compatible coding agents 在长时间 `/goal` 工作中跨越 compaction、resume 和 handoff 仍然保持方向。
 
 它不添加隐藏的记忆引擎。它给 agent 一个可持续的工作习惯：
 
@@ -24,24 +24,30 @@ Codex Goalkeeper 是一个很小的 skill，用来帮助 Codex 在长时间 `/go
 ## 安装
 
 ```bash
-npx skills add deltafleet/codex-goalkeeper
+npx skills add deltafleet/goalkeeper
 ```
 
-要求: Node.js 18+ 和 `npx`。在长 goal workflow 中，Codex 会使用 skill 内置的 Node helper scripts。
+如果要明确指定 agent：
 
-当请求和 metadata 高度匹配时，Codex 可以自动加载已安装的 skill。Goalkeeper 的 metadata 面向 `/goal`、长时间任务、compaction、resume、handoff 和 continuity preservation。
+```bash
+npx skills add deltafleet/goalkeeper --agent claude-code codex
+```
+
+要求: Node.js 18+ 和 `npx`。在长 goal workflow 中，agent 会使用 skill 内置的 Node helper scripts。
+
+当请求和 metadata 高度匹配时，Skill-compatible agent 可以自动加载已安装的 skill。Goalkeeper 的 metadata 面向 `/goal`、长时间任务、compaction、resume、handoff 和 continuity preservation。
 
 所以像下面这样的 goal 可能已经足够触发它：
 
 > `/goal` Harden this release over a long-running session. Keep the goal, constraints, rejected paths, failed attempts, verification state, and next action recoverable after compact/resume.
 
-但 skill activation 仍然是 routing decision，不是私有的 Codex runtime hook。Goalkeeper 不能强制自己附着到每一个 goal。
+但 skill activation 仍然是 routing decision，不是私有的 agent runtime hook。Goalkeeper 不能强制自己附着到每一个 goal。
 
 对于重要的长期任务，最稳妥的做法是在创建 goal 时，或创建 goal 后正式开始工作前，明确调用它：
 
-> Use codex-goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
+> Use goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
 
-之后用户不需要手动执行 Goalkeeper 的 helper scripts。Codex 会把它们作为 skill workflow 的一部分来运行。
+之后用户不需要手动执行 Goalkeeper 的 helper scripts。agent 会把它们作为 skill workflow 的一部分来运行。
 
 ## 问题
 
@@ -51,11 +57,11 @@ npx skills add deltafleet/codex-goalkeeper
 
 想象一个真实会话：
 
-1. 你让 Codex 做 release hardening。
+1. 你让 agent 做 release hardening。
 2. 最显眼的 patch 能修掉眼前的 bug，但会破坏 rollback compatibility。
 3. 你设下硬约束：不能改 database schema，必须保持 backward compatibility。
 4. 第二次尝试通过了 unit tests，但在 integration edge case 上失败。
-5. Codex 选择 compatibility shim 加 targeted regression test。
+5. agent 选择 compatibility shim 加 targeted regression test。
 6. regression test 通过了。这条路线现在是安全路线。
 7. 上下文被 compact。
 8. 后来 agent 带着整洁摘要回来：“release hardening 基本完成。”
@@ -76,9 +82,9 @@ drift 就从这里开始。
 
 Goalkeeper 解决的是这个空隙：goal 还在，但会话的方向感已经变弱。
 
-## Codex 会做什么
+## Agent 会做什么
 
-skill 激活后，Codex 会在项目内维护一个连续性文件夹：
+skill 激活后，agent 会在项目内维护一个连续性文件夹：
 
 ```text
 .goalkeeper/
@@ -96,7 +102,7 @@ skill 激活后，Codex 会在项目内维护一个连续性文件夹：
 - `context-pack.md`: 对 checkpoint 来说太长、但 compaction 后仍应保留的推理链
 - `events.jsonl`: 决策、失败尝试、命令证据、验证、风险和 handoff 记录
 
-Codex 的 active goal 说明目的地。Goalkeeper 保存为什么这条路线仍然正确。
+active goal 说明目的地。Goalkeeper 保存为什么这条路线仍然正确。
 
 ## 工作原理
 
@@ -104,15 +110,15 @@ Goalkeeper 把长时间 agent 工作变成一个简单循环：
 
 ```text
 长 /goal 开始
-  -> Codex 创建或恢复 Goalkeeper session
+  -> agent 创建或恢复 Goalkeeper session
   -> 记录重要约束和决策
   -> 保留失败尝试，避免重复犯错
   -> 在信心变化时记录验证证据
   -> 在有意义的边界刷新 checkpoint.md
   -> context-pack.md 保存更深的推理链
-  -> resume、handoff 或怀疑 compaction 后，Codex 先读 checkpoint.md
-  -> 如果 checkpoint 太薄，Codex 再读 context-pack.md
-  -> 如果需要精确证据，Codex 检查 events.jsonl 或 source files
+  -> resume、handoff 或怀疑 compaction 后，agent 先读 checkpoint.md
+  -> 如果 checkpoint 太薄，agent 再读 context-pack.md
+  -> 如果需要精确证据，agent 检查 events.jsonl 或 source files
 ```
 
 这不是保存对话 transcript。它保存的是工作状态。
@@ -130,15 +136,15 @@ Goalkeeper 把长时间 agent 工作变成一个简单循环：
 
 Goalkeeper 故意避开这些。
 
-它使用文件，因为文件可见、可审查、可移动，并且 compaction 后 agent 容易重新读取。目标不是让 Codex 全知全能。目标是让下一轮从正确状态开始。
+它使用文件，因为文件可见、可审查、可移动，并且 compaction 后 agent 容易重新读取。目标不是让 agent 全知全能。目标是让下一轮从正确状态开始。
 
 ## 它不是什么
 
-- 不是 Codex plugin。
+- 不是 Codex 或 Claude Code plugin。
 - 不是 MCP server。
 - 不是 database。
 - 不是完整对话 transcript 仓库。
-- 不是 private Codex runtime hook。
+- 不是 private agent runtime hook。
 - 不保证完美记忆。
 - 不会降低 compaction 频率。
 
@@ -160,7 +166,7 @@ Goalkeeper 改善连续性。它不假装消除上下文限制。
 ## Repository Layout
 
 ```text
-src/codex-goalkeeper/       # installable skill payload
+src/goalkeeper/       # installable skill payload
   SKILL.md
   agents/openai.yaml
   scripts/
@@ -182,7 +188,7 @@ npm run validate
 Equivalent manual checks:
 
 ```bash
-find src/codex-goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check
+find src/goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check
 node tests/test-goalkeeper-update-checkpoint.mjs
 npx skills add . --list
 ```

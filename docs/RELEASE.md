@@ -1,14 +1,14 @@
 # Release Policy
 
-Codex Goalkeeper is released as a GitHub repository and optional npm package.
+Goalkeeper is released as a GitHub repository and optional npm package.
 
 The installable skill source of truth is:
 
-- `src/codex-goalkeeper/SKILL.md`
-- `src/codex-goalkeeper/agents/openai.yaml`
-- `src/codex-goalkeeper/scripts/`
-- `src/codex-goalkeeper/references/`
-- `src/codex-goalkeeper/templates/`
+- `src/goalkeeper/SKILL.md`
+- `src/goalkeeper/agents/openai.yaml`
+- `src/goalkeeper/scripts/`
+- `src/goalkeeper/references/`
+- `src/goalkeeper/templates/`
 - `examples/`
 - `docs/`
 

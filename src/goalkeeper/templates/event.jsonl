@@ -1,3 +1,3 @@
-{"ts":"2026-05-17T00:00:00Z","type":"goal","text":"Define the active long-running Codex goal.","status":"open"}
+{"ts":"2026-05-17T00:00:00Z","type":"goal","text":"Define the active long-running agent goal.","status":"open"}
 {"ts":"2026-05-17T00:00:00Z","type":"user_constraint","text":"Record durable user constraints that must survive compaction."}
 {"ts":"2026-05-17T00:00:00Z","type":"decision","text":"Record the current direction and why it was chosen."}

@@ -2,14 +2,14 @@
 
 ## Active Goal
 
-- Objective: Ship a long-running Codex feature without losing direction after repeated compaction.
+- Objective: Ship a long-running agent feature without losing direction after repeated compaction.
 - Done criteria: The implementation, tests, documentation, and handoff are complete; no known blocker remains untracked.
-- Current status: Example state for Codex Goalkeeper.
+- Current status: Example state for Goalkeeper.
 
 ## Throughline
 
 - Current direction: Preserve the user's intent, constraints, major decisions, verification state, and next action in a short project-local checkpoint.
-- Why this direction: Codex's active goal describes the destination, but repeated compaction can blur the decision chain that explains how to keep moving.
+- Why this direction: The host agent's active goal describes the destination, but repeated compaction can blur the decision chain that explains how to keep moving.
 
 ## Constraints
 
@@ -26,7 +26,7 @@
 ## Attempts And Failures
 
 - Avoid writing full transcripts into the checkpoint; it becomes too long to read routinely.
-- Avoid relying only on the active Codex goal; it does not preserve enough decision context.
+- Avoid relying only on the active goal; it does not preserve enough decision context.
 
 ## Important Files
 

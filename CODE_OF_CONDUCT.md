@@ -1,6 +1,6 @@
 # Code of Conduct
 
-Codex Goalkeeper uses a simple contributor standard:
+Goalkeeper uses a simple contributor standard:
 
 - Be direct, respectful, and specific.
 - Critique ideas and patches, not people.

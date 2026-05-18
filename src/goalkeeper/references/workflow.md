@@ -4,7 +4,7 @@
 
 When a user starts a long-running goal:
 
-1. Confirm the active objective from the user request or Codex goal state.
+1. Confirm the active objective from the user request or host agent goal state.
 2. Choose a stable goal session id.
 3. Create `.goalkeeper/sessions/<goal-session-id>/checkpoint.md` if missing.
 4. Create `.goalkeeper/sessions/<goal-session-id>/context-pack.md` if missing.
@@ -144,7 +144,7 @@ The goal session directory is project-local, not global:
 <workspace>/.goalkeeper/sessions/<goal-session-id>/
 ```
 
-Use one directory per long-running Codex goal session. A compacted conversation, resumed thread, or handoff should keep using the same directory when the underlying goal is the same.
+Use one directory per long-running agent goal session. A compacted conversation, resumed thread, or handoff should keep using the same directory when the underlying goal is the same.
 
 Suggested id format:
 
@@ -155,7 +155,7 @@ YYYY-MM-DD-short-goal-slug
 Example:
 
 ```text
-.goalkeeper/sessions/2026-05-17-codex-goalkeeper-roadmap/
+.goalkeeper/sessions/2026-05-17-goalkeeper-roadmap/
 ```
 
 ## Handoff

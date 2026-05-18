@@ -49,7 +49,7 @@ When `<workspace>/.goalkeeper/active-session` points to the current session, `--
 - `risk`: unresolved risk or blocker.
 - `handoff`: current state prepared for resume.
 - `next_action`: explicit next step.
-- `compact_observed`: a real Codex compaction boundary was observed.
+- `compact_observed`: a real agent compaction boundary was observed.
 - `recovery_violation`: the agent continued after compaction or resume before reading the Goalkeeper checkpoint.
 
 ## Writing Rules

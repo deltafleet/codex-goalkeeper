@@ -6,7 +6,7 @@ This example context pack keeps reasoning that is too detailed for the checkpoin
 
 ## Active Goal
 
-Ship a long-running Codex feature without losing direction after repeated compaction.
+Ship a long-running agent feature without losing direction after repeated compaction.
 
 ## Durable Constraints
 
@@ -28,7 +28,7 @@ Ship a long-running Codex feature without losing direction after repeated compac
 ## Rejected Alternatives
 
 - Full transcript storage in the checkpoint.
-- Treating Codex goal metadata as enough for long-running work.
+- Treating host-agent goal metadata as enough for long-running work.
 
 ## Open Threads
 

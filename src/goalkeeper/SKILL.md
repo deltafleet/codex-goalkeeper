@@ -1,17 +1,17 @@
 ---
-name: codex-goalkeeper
-description: Use automatically for Codex /goal work, long-running goals, multi-turn implementations, session resumes, handoffs, compacted conversations, or any task where Codex must preserve constraints, decisions, verification state, failed attempts, pre-compaction reasoning, and next actions. Maintains a project-local checkpoint, context pack, and append-only event log.
+name: goalkeeper
+description: Use automatically for Claude Code /goal, Codex /goal, long-running agent goals, multi-turn implementations, session resumes, handoffs, compacted conversations, or any task where an AI coding agent must preserve constraints, decisions, verification state, failed attempts, pre-compaction reasoning, and next actions. Maintains a project-local checkpoint, context pack, and append-only event log.
 ---
 
-# Codex Goalkeeper
+# Goalkeeper
 
-Use this skill when a Codex task is expected to run long enough that compaction, handoff, or drift could cause the agent to lose direction.
+Use this skill when an AI coding agent task is expected to run long enough that compaction, handoff, or drift could cause the agent to lose direction.
 
-Goalkeeper does not replace Codex's goal system. It records the working continuity around the goal.
+Goalkeeper does not replace the host agent's goal system. It records the working continuity around the goal.
 
 Goalkeeper is a best-effort continuity habit, not a guarantee that every compacted turn will recover perfectly.
 
-When a user starts or continues a `/goal`, strongly prefer initializing or resuming Goalkeeper unless the task is clearly short-lived.
+When a user starts or continues a `/goal` in Claude Code, Codex, or another skill-compatible agent, strongly prefer initializing or resuming Goalkeeper unless the task is clearly short-lived.
 
 ## First Action Rule
 
@@ -43,18 +43,20 @@ Use a project-local `.goalkeeper/` directory. Each long-running goal session get
       events.jsonl
 ```
 
-Use a stable, readable `<goal-session-id>` such as `2026-05-17-codex-goalkeeper-roadmap` or `ads-ops-release-hardening`.
+Use a stable, readable `<goal-session-id>` such as `2026-05-17-goalkeeper-roadmap` or `ads-ops-release-hardening`.
 
 If any core file is missing during long goal work, create it from the templates in `templates/`.
 Use `.goalkeeper/active-session` when a workspace has one active Goalkeeper session and the agent should not have to reconstruct the session id after compaction.
 
-The directory is created inside the active project workspace, not in a global Codex directory. Example:
+The directory is created inside the active project workspace, not in a global agent directory. Example:
 
 ```text
 /path/to/project/.goalkeeper/sessions/2026-05-17-release-hardening/checkpoint.md
 ```
 
-Bundled scripts live in the skill package. When the script is not located inside the target workspace, pass the target workspace explicitly:
+Bundled scripts live in the skill package. When the script is not located inside the target workspace, pass the target workspace explicitly.
+
+In Claude Code, `${CLAUDE_SKILL_DIR}` can resolve the installed skill directory. In other agents, use the concrete installed skill path:
 
 ```bash
 node <skill-path>/scripts/goalkeeper-turn-start.mjs --workspace <workspace> --session <goal-session-id>
@@ -159,6 +161,6 @@ Read it when checkpoint recovery is not enough. Keep raw transcripts and long co
 
 ## Safety Boundary
 
-- Do not depend on private Codex runtime internals.
+- Do not depend on private Codex, Claude Code, or other host-agent runtime internals.
 - Do not claim this reduces compaction frequency.
 - Do not treat the checkpoint as proof when exact evidence is needed; inspect `events.jsonl` or source files.

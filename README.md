@@ -1,6 +1,6 @@
-# Codex Goalkeeper
+# Goalkeeper
 
-Long Codex runs do not usually fail all at once.
+Long agent runs do not usually fail all at once.
 
 They drift.
 
@@ -8,7 +8,7 @@ The agent still sounds confident. The tests still run. The plan still looks plau
 
 > Why were we doing it this way?
 
-Codex Goalkeeper is a small skill that helps Codex keep long-running `/goal` work oriented across compaction, resumes, and handoffs.
+Goalkeeper is a small Agent Skill that helps Claude Code, Codex, and other skill-compatible coding agents keep long-running `/goal` work oriented across compaction, resumes, and handoffs.
 
 It does not add a hidden memory engine. It gives the agent a durable working ritual:
 
@@ -24,38 +24,44 @@ Boring files. Better continuity.
 ## Install
 
 ```bash
-npx skills add deltafleet/codex-goalkeeper
+npx skills add deltafleet/goalkeeper
 ```
 
-Requirements: Node.js 18+ and `npx`. Codex uses the skill's bundled Node helper scripts during long-goal workflows.
+To target specific agents explicitly:
 
-Codex can automatically load installed skills when a request strongly matches their metadata. Goalkeeper is written to match `/goal`, long-running work, compaction, resume, handoff, and continuity-preservation language.
+```bash
+npx skills add deltafleet/goalkeeper --agent claude-code codex
+```
+
+Requirements: Node.js 18+ and `npx`. The agent uses the skill's bundled Node helper scripts during long-goal workflows.
+
+Skill-compatible agents can automatically load installed skills when a request strongly matches their metadata. Goalkeeper is written to match `/goal`, long-running work, compaction, resume, handoff, and continuity-preservation language.
 
 So this can be enough:
 
 > `/goal` Harden this release over a long-running session. Keep the goal, constraints, rejected paths, failed attempts, verification state, and next action recoverable after compact/resume.
 
-But skill activation is still a routing decision, not a private Codex runtime hook. Goalkeeper cannot force itself onto every goal.
+But skill activation is still a routing decision, not a private runtime hook. Goalkeeper cannot force itself onto every goal.
 
 For important long-running work, the safest path is to be explicit when you create the goal, or immediately after creating it:
 
-> Use codex-goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
+> Use goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
 
-After that, you should not have to run Goalkeeper's helper scripts yourself. Codex runs them as part of the skill workflow.
+After that, you should not have to run Goalkeeper's helper scripts yourself. The agent runs them as part of the skill workflow.
 
 ## The Problem
 
-If you use Codex for small tasks, compaction is just a detail. The agent can usually recover.
+If you use an agent for small tasks, compaction is just a detail. The agent can usually recover.
 
 But long goals are different.
 
 Imagine a real session:
 
-1. You ask Codex to harden a release.
+1. You ask an agent to harden a release.
 2. The obvious patch fixes the visible bug, but would break rollback compatibility.
 3. You set a hard constraint: no database schema change, keep backward compatibility.
 4. A second attempt passes unit tests, but fails an integration edge case.
-5. Codex settles on a compatibility shim plus a targeted regression test.
+5. The agent settles on a compatibility shim plus a targeted regression test.
 6. The regression test passes. That path is now the safe one.
 7. The context compacts.
 8. Later, the agent resumes from a clean summary: "release hardening mostly done."
@@ -76,9 +82,9 @@ You see it when an agent:
 
 Goalkeeper exists for that gap between "the goal is still known" and "the session still has its bearings."
 
-## What Codex Does
+## What The Agent Does
 
-When the skill is active, Codex maintains a project-local continuity folder:
+When the skill is active, the agent maintains a project-local continuity folder:
 
 ```text
 .goalkeeper/
@@ -96,7 +102,7 @@ Each file has a different job:
 - `context-pack.md` preserves the reasoning chain that is too detailed for the checkpoint.
 - `events.jsonl` records decisions, failed attempts, command evidence, verification, risks, and handoffs.
 
-The active Codex goal says where the work is going. Goalkeeper preserves why this is still the right route.
+The active goal says where the work is going. Goalkeeper preserves why this is still the right route.
 
 ## How It Works
 
@@ -104,15 +110,15 @@ Goalkeeper turns long agent work into a simple loop:
 
 ```text
 Long /goal begins
-  -> Codex creates or resumes a Goalkeeper session
+  -> the agent creates or resumes a Goalkeeper session
   -> important constraints and decisions are recorded
   -> failed attempts are kept so they are not repeated
   -> verification evidence is logged when confidence changes
   -> checkpoint.md is refreshed at meaningful boundaries
   -> context-pack.md keeps the deeper reasoning chain
-  -> after resume, handoff, or suspected compaction, Codex reads checkpoint.md first
-  -> if the checkpoint is too thin, Codex reads context-pack.md
-  -> if exact proof is needed, Codex checks events.jsonl or source files
+  -> after resume, handoff, or suspected compaction, the agent reads checkpoint.md first
+  -> if the checkpoint is too thin, the agent reads context-pack.md
+  -> if exact proof is needed, the agent checks events.jsonl or source files
 ```
 
 This is not transcript storage. It is working-state preservation.
@@ -130,15 +136,15 @@ The obvious version of this project is too big:
 
 Goalkeeper intentionally avoids that.
 
-It uses files because files are visible, reviewable, portable, and easy for agents to read after compaction. The point is not to make Codex omniscient. The point is to make the next turn start from the right state.
+It uses files because files are visible, reviewable, portable, and easy for agents to read after compaction. The point is not to make the agent omniscient. The point is to make the next turn start from the right state.
 
 ## What This Is Not
 
-- Not a Codex plugin.
+- Not a Codex or Claude Code plugin.
 - Not an MCP server.
 - Not a database.
 - Not a transcript archive.
-- Not a private Codex runtime hook.
+- Not a private agent runtime hook.
 - Not a guarantee of perfect memory.
 - Not a way to reduce compaction frequency.
 
@@ -160,7 +166,7 @@ That is enough to prevent many of the boring, expensive failures in long agent r
 ## Repository Layout
 
 ```text
-src/codex-goalkeeper/       # installable skill payload
+src/goalkeeper/       # installable skill payload
   SKILL.md
   agents/openai.yaml
   scripts/
@@ -182,7 +188,7 @@ npm run validate
 Equivalent manual checks:
 
 ```bash
-find src/codex-goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check
+find src/goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check
 node tests/test-goalkeeper-update-checkpoint.mjs
 npx skills add . --list
 ```
