@@ -119,9 +119,13 @@ Goalkeeper는 긴 에이전트 작업을 단순한 루프로 바꿉니다.
   -> resume, handoff, compact 의심 이후 agent는 checkpoint.md를 먼저 읽는다
   -> checkpoint가 얇으면 context-pack.md를 읽는다
   -> 정확한 증거가 필요하면 events.jsonl이나 source file을 확인한다
+  -> goal이 끝나면 agent가 Goalkeeper 세션을 닫는다
+  -> 이후 관련 없는 일반 질문에는 Goalkeeper recovery가 붙지 않는다
 ```
 
 이것은 대화 transcript 저장이 아닙니다. 작업 상태 보존입니다.
+
+Goalkeeper가 영원히 붙어 있으면 안 됩니다. 관리하던 goal이 끝나면 agent가 최종 결과를 기록하고, checkpoint를 closed 상태로 표시하고, active session pointer를 제거한 뒤 완료 보고를 합니다.
 
 ## 일부러 작게 만들었습니다
 

@@ -249,6 +249,50 @@ function main() {
   const parsedDoctor = JSON.parse(doctor.stdout);
   assert(parsedDoctor.ok === true, "doctor JSON should be ok");
 
+  const close = run([
+    script("goalkeeper-close.mjs"),
+    "--workspace",
+    WORKSPACE,
+    "--outcome",
+    "Canonical checkpoint update validation is complete.",
+    "--evidence",
+    "Strict doctor passed before close.",
+    "--json",
+  ]);
+  assert(close.status === 0, `close failed:\n${close.stderr}\n${close.stdout}`);
+  const parsedClose = JSON.parse(close.stdout);
+  assert(parsedClose.activeSession.removed === true, "close should remove active-session when it points to the closed session");
+  assert(!fs.existsSync(path.join(WORKSPACE, ".goalkeeper", "active-session")), "active-session should be absent after close");
+  const closedCheckpoint = fs.readFileSync(checkpointPath, "utf8");
+  assert(closedCheckpoint.includes("- Current status: Closed."), "close should mark checkpoint status closed");
+  assert(closedCheckpoint.includes("## Closed"), "close should add a Closed section");
+  const closeEvents = fs
+    .readFileSync(path.join(WORKSPACE, ".goalkeeper", "sessions", SESSION_ID, "events.jsonl"), "utf8")
+    .trim()
+    .split(/\r?\n/)
+    .map((line) => JSON.parse(line));
+  const lastEvent = closeEvents.at(-1);
+  assert(lastEvent.type === "close", "close should append a close event");
+  assert(lastEvent.status === "closed", "close event should use closed status");
+
+  const turnStartAfterCloseWithoutSession = run([
+    script("goalkeeper-turn-start.mjs"),
+    "--workspace",
+    WORKSPACE,
+    "--json",
+  ]);
+  assert(turnStartAfterCloseWithoutSession.status === 1, "turn-start without --session should fail after close removes active-session");
+
+  const turnStartClosedExplicit = run([
+    script("goalkeeper-turn-start.mjs"),
+    "--workspace",
+    WORKSPACE,
+    "--session",
+    SESSION_ID,
+    "--json",
+  ]);
+  assert(turnStartClosedExplicit.status === 0, "closed sessions should remain readable when explicitly requested");
+
   console.log(
     JSON.stringify(
       {
@@ -256,6 +300,7 @@ function main() {
         workspace: WORKSPACE,
         sessionId: SESSION_ID,
         checkpointBytes: parsedUpdate.bytes,
+        close: parsedClose.activeSession,
         doctor: parsedDoctor.summary,
       },
       null,

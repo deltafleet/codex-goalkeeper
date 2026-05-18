@@ -1,6 +1,8 @@
 # Goalkeeper Guardrail
 
-When this repository has an active `.goalkeeper/sessions/<goal-session-id>/` directory, treat it as the continuity source for long-running agent work.
+When this repository has an active `.goalkeeper/active-session` pointer, treat the referenced `.goalkeeper/sessions/<goal-session-id>/` directory as the continuity source for long-running agent work.
+
+If `.goalkeeper/active-session` is absent and the user asks an unrelated question, do not read closed Goalkeeper sessions first.
 
 At the start of each new assistant turn, before reading normal project files or making edits:
 
@@ -44,5 +46,7 @@ Allowed before reading the checkpoint:
 Do not read project docs, source files, examples, tests, or make edits before the checkpoint read.
 
 If you notice that you continued after compaction or resume without reading the checkpoint, stop, read it immediately, append a `recovery_violation` event, then continue from the recovered state.
+
+When the managed goal is complete, run `goalkeeper-close.mjs` before sending the final completion response. This records the final outcome and removes `.goalkeeper/active-session` so later unrelated questions are not treated as goal recovery.
 
 Do not claim Goalkeeper reduces compaction frequency. Its purpose is direction recovery after compaction, resume, or handoff.

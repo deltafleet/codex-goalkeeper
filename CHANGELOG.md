@@ -4,6 +4,12 @@ All notable changes to Goalkeeper are documented here.
 
 This project follows [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-05-18
+
+- Added `goalkeeper-close.mjs` so agents can shut down Goalkeeper sessions when a goal completes.
+- Added the `close` event type and `closed` event status.
+- Added shutdown instructions so Goalkeeper stops applying checkpoint-first recovery to unrelated questions after completion.
+
 ## [0.2.1] - 2026-05-18
 
 - Simplified public invocation copy to `Use goalkeeper for this goal.`

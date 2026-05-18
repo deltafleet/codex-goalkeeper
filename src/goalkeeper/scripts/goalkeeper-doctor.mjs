@@ -19,9 +19,10 @@ const EVENT_TYPES = new Set([
   "next_action",
   "compact_observed",
   "recovery_violation",
+  "close",
 ]);
 
-const STATUSES = new Set(["open", "done", "failed", "blocked", "superseded"]);
+const STATUSES = new Set(["open", "done", "failed", "blocked", "superseded", "closed"]);
 const CHECKPOINT_TARGET_BYTES = 8_000;
 const CHECKPOINT_MAX_BYTES = 16_000;
 const CONTEXT_PACK_TARGET_BYTES = 30_000;

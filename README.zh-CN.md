@@ -119,9 +119,13 @@ Goalkeeper 把长时间 agent 工作变成一个简单循环：
   -> resume、handoff 或怀疑 compaction 后，agent 先读 checkpoint.md
   -> 如果 checkpoint 太薄，agent 再读 context-pack.md
   -> 如果需要精确证据，agent 检查 events.jsonl 或 source files
+  -> goal 完成后，agent 关闭 Goalkeeper session
+  -> 之后无关的一般问题不会触发 Goalkeeper recovery
 ```
 
 这不是保存对话 transcript。它保存的是工作状态。
+
+Goalkeeper 不应该一直附着在会话上。被管理的 goal 完成后，agent 会记录最终结果，把 checkpoint 标记为 closed，移除 active session pointer，然后再汇报完成。
 
 ## 为什么故意做得很小
 

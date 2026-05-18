@@ -17,6 +17,8 @@ When a user starts or continues a `/goal` in Claude Code, Codex, or another skil
 
 When a Goalkeeper-managed goal is already active, the first project-state action in a new assistant turn should be reading the active checkpoint, unless you have already read it in the same turn.
 
+Only treat Goalkeeper as active when `<workspace>/.goalkeeper/active-session` points to a live session or the user explicitly asks to resume a specific Goalkeeper session. If no active session pointer exists and the user asks an unrelated question, do not apply checkpoint-first recovery.
+
 This is stricter than waiting until you notice compaction. A compacted turn may not reliably expose the compaction marker to the model, so checkpoint-first is the practical recovery rule for long-running goals.
 
 Allowed before the checkpoint read:
@@ -113,6 +115,31 @@ Update Goalkeeper state when any of these change:
 Append the event first, then update the session's `checkpoint.md` when the event changes the current working state.
 Use `scripts/goalkeeper-update-checkpoint.mjs` when you want a bounded canonical checkpoint instead of manual Markdown edits.
 
+## Shutdown Rule
+
+When a Goalkeeper-managed goal is complete, shut down the active Goalkeeper session before sending the final completion response.
+
+Do this when:
+
+- the done criteria are satisfied
+- the user explicitly ends the goal
+- the work is abandoned, superseded, or intentionally paused without needing checkpoint-first recovery on unrelated questions
+
+Shutdown steps:
+
+1. Append a final `close` event.
+2. Mark `checkpoint.md` as closed with the final outcome and residual risks.
+3. Remove `.goalkeeper/active-session` when it points to the closed session.
+4. Do not apply checkpoint-first recovery to later unrelated user questions.
+
+Use the close helper:
+
+```bash
+node <skill-path>/scripts/goalkeeper-close.mjs --workspace <workspace> --outcome "<final outcome>"
+```
+
+After shutdown, read the closed session again only if the user explicitly resumes that goal or asks about its history.
+
 ## Keep It Short
 
 The checkpoint is a recovery artifact, not a transcript.
@@ -157,6 +184,7 @@ Read it when checkpoint recovery is not enough. Keep raw transcripts and long co
 - Run `scripts/goalkeeper-turn-start.mjs --context` when checkpoint recovery needs the larger context pack too.
 - Run `scripts/goalkeeper-append-event.mjs` instead of hand-writing JSONL when recording decisions, verification, failures, risks, or handoffs; it can use `.goalkeeper/active-session` when `--session` is omitted.
 - Run `scripts/goalkeeper-update-checkpoint.mjs` after appending a meaningful event when checkpoint state should be refreshed in a short canonical shape.
+- Run `scripts/goalkeeper-close.mjs` before the final completion response when the managed goal is done, abandoned, or superseded.
 - Run `scripts/goalkeeper-doctor.mjs` after creating or changing Goalkeeper state to verify the target workspace is ready.
 
 ## Safety Boundary

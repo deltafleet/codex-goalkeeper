@@ -119,9 +119,13 @@ Long /goal begins
   -> after resume, handoff, or suspected compaction, the agent reads checkpoint.md first
   -> if the checkpoint is too thin, the agent reads context-pack.md
   -> if exact proof is needed, the agent checks events.jsonl or source files
+  -> when the goal is done, the agent closes the Goalkeeper session
+  -> later unrelated questions do not trigger Goalkeeper recovery
 ```
 
 This is not transcript storage. It is working-state preservation.
+
+Goalkeeper should not stay attached forever. A managed goal has a shutdown step: the agent records the final outcome, marks the checkpoint closed, and removes the active session pointer before giving the completion response.
 
 ## Why It Is Small On Purpose
 

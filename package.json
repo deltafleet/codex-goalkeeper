@@ -1,6 +1,6 @@
 {
   "name": "@deltafleet/goalkeeper",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A small Agent Skill for keeping long-running goals oriented across compaction, resumes, and handoffs.",
   "license": "MIT",
   "type": "module",
@@ -29,11 +29,13 @@
     "goalkeeper-append-event": "src/goalkeeper/scripts/goalkeeper-append-event.mjs",
     "goalkeeper-update-checkpoint": "src/goalkeeper/scripts/goalkeeper-update-checkpoint.mjs",
     "goalkeeper-doctor": "src/goalkeeper/scripts/goalkeeper-doctor.mjs",
+    "goalkeeper-close": "src/goalkeeper/scripts/goalkeeper-close.mjs",
     "codex-goalkeeper-init": "src/goalkeeper/scripts/goalkeeper-init.mjs",
     "codex-goalkeeper-turn-start": "src/goalkeeper/scripts/goalkeeper-turn-start.mjs",
     "codex-goalkeeper-append-event": "src/goalkeeper/scripts/goalkeeper-append-event.mjs",
     "codex-goalkeeper-update-checkpoint": "src/goalkeeper/scripts/goalkeeper-update-checkpoint.mjs",
-    "codex-goalkeeper-doctor": "src/goalkeeper/scripts/goalkeeper-doctor.mjs"
+    "codex-goalkeeper-doctor": "src/goalkeeper/scripts/goalkeeper-doctor.mjs",
+    "codex-goalkeeper-close": "src/goalkeeper/scripts/goalkeeper-close.mjs"
   },
   "files": [
     "src/goalkeeper",

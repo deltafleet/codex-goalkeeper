@@ -18,7 +18,7 @@ The project has one strong bias: keep the core small enough that agents will act
 - Background processes.
 - Runtime hooks into private host-agent internals.
 - Global databases or cross-project indexing.
-- Large abstractions around the five core helper scripts.
+- Large abstractions around the six core helper scripts.
 
 These may be useful later, but they should not enter the project without a clear real-world failure case.
 

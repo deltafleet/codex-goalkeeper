@@ -73,6 +73,8 @@ Use `context-pack.md` for medium-density reasoning that should survive compactio
 
 For an already active Goalkeeper-managed task, begin each new assistant turn with a checkpoint-first recovery read before touching normal project files.
 
+Only apply this rule when `.goalkeeper/active-session` exists or the user explicitly resumes a known Goalkeeper session. If the active pointer is absent and the user asks an unrelated question, do not read closed sessions first.
+
 Recommended sequence:
 
 ```bash
@@ -165,6 +167,23 @@ Before ending a long working segment:
 1. Append a `handoff` event.
 2. Update `checkpoint.md` with the current state and exact next action.
 3. Include unresolved risks and verification gaps.
+
+## Shutdown
+
+Before sending the final completion response for a Goalkeeper-managed goal:
+
+1. Confirm the done criteria are satisfied, or that the goal was explicitly abandoned or superseded.
+2. Run the close helper:
+
+   ```bash
+   node <skill-path>/scripts/goalkeeper-close.mjs --workspace <workspace> --outcome "<final outcome>"
+   ```
+
+3. Include repeated `--risk "<text>"` and `--evidence "<text>"` fields when residual risks or final proof should remain recoverable.
+4. Verify `.goalkeeper/active-session` was removed when it pointed to the closed session.
+5. Send the final completion response.
+
+After shutdown, do not apply checkpoint-first recovery to unrelated user questions. Read the closed session only if the user explicitly resumes that goal or asks about its history.
 
 ## Checkpoint Update Guidance
 

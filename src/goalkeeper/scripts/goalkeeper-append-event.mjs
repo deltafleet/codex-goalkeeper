@@ -17,9 +17,10 @@ const EVENT_TYPES = new Set([
   "next_action",
   "compact_observed",
   "recovery_violation",
+  "close",
 ]);
 
-const STATUSES = new Set(["open", "done", "failed", "blocked", "superseded"]);
+const STATUSES = new Set(["open", "done", "failed", "blocked", "superseded", "closed"]);
 
 const USAGE = `Usage:
   node scripts/goalkeeper-append-event.mjs --type <event-type> --text <summary> [--session <goal-session-id>] [--workspace <path>] [--goal <text>] [--reason <text>] [--evidence <text>] [--status <status>] [--file <path> ...] [--command <cmd> ...] [--ts <iso>] [--json]

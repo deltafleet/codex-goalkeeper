@@ -30,6 +30,9 @@ For an active Goalkeeper-managed goal:
 2. Use `context-pack.md` when the checkpoint is too thin to recover the reasoning chain.
 3. Use `events.jsonl` only when exact evidence is needed.
 4. Append `recovery_violation` if the agent continued after compaction or resume before reading the checkpoint.
+5. When the goal is complete, run `goalkeeper-close.mjs` before the final completion response.
+
+If `.goalkeeper/active-session` is absent and the user asks an unrelated question, do not read closed Goalkeeper sessions first.
 
 If `scripts/goalkeeper-turn-start.mjs` is present, it can be used as the first recovery action:
 
@@ -59,6 +62,12 @@ Before starting a high-stakes long run, use the read-only doctor to verify the t
 
 ```bash
 node <skill-path>/scripts/goalkeeper-doctor.mjs --workspace <workspace> --session <goal-session-id> --strict
+```
+
+When the managed goal is done, close the session:
+
+```bash
+node <skill-path>/scripts/goalkeeper-close.mjs --workspace <workspace> --outcome "<final outcome>"
 ```
 
 Parallel calls are still subject to checkpoint-first ordering. It is acceptable to batch `pwd`, `.goalkeeper/sessions` discovery, and `goalkeeper-turn-start.mjs`; it is not acceptable to include normal project files or verification in that same first post-compact parallel call.

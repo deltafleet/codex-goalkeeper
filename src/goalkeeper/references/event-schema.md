@@ -33,7 +33,7 @@ When `<workspace>/.goalkeeper/active-session` points to the current session, `--
 - `evidence`: short supporting detail.
 - `files`: array of file paths.
 - `commands`: array of commands.
-- `status`: `open`, `done`, `failed`, `blocked`, or `superseded`.
+- `status`: `open`, `done`, `failed`, `blocked`, `superseded`, or `closed`.
 - `supersedes`: event id or short reference.
 
 ## Initial Types
@@ -51,6 +51,7 @@ When `<workspace>/.goalkeeper/active-session` points to the current session, `--
 - `next_action`: explicit next step.
 - `compact_observed`: a real agent compaction boundary was observed.
 - `recovery_violation`: the agent continued after compaction or resume before reading the Goalkeeper checkpoint.
+- `close`: the managed goal was completed, abandoned, or superseded and the active session should stop applying to unrelated questions.
 
 ## Writing Rules
 

@@ -4,7 +4,7 @@
 
 Long-running agent goals need a small continuity layer outside the model context.
 
-Goalkeeper should stay boring: a short checkpoint, a medium-density context pack, an append-only event log, a turn-start helper, and a doctor check. It should not become a substitute context engine or a promise of perfect post-compact recovery.
+Goalkeeper should stay boring: a short checkpoint, a medium-density context pack, an append-only event log, a turn-start helper, a close helper, and a doctor check. It should not become a substitute context engine or a promise of perfect post-compact recovery.
 
 ## MVP
 
@@ -27,6 +27,7 @@ Core behavior:
 - read the context pack when the checkpoint is too thin to recover pre-compaction reasoning
 - append meaningful decisions, failures, verification, and handoff events
 - refresh the checkpoint when recoverable working state changes
+- close the active session when the managed goal completes so unrelated questions do not trigger recovery
 - run a read-only doctor before trusting a workspace for long work
 
 ## User-Facing Scope
@@ -37,6 +38,7 @@ Keep these scripts central:
 - `goalkeeper-turn-start.mjs`
 - `goalkeeper-append-event.mjs`
 - `goalkeeper-update-checkpoint.mjs`
+- `goalkeeper-close.mjs`
 - `goalkeeper-doctor.mjs`
 
 Keep this optional and maintainer-oriented:
