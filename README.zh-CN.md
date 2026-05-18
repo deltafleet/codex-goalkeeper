@@ -39,15 +39,15 @@ npx skills add deltafleet/goalkeeper --agent claude-code codex
 
 所以像下面这样的 goal 可能已经足够触发它：
 
-> `/goal` Harden this release over a long-running session. Keep the goal, constraints, rejected paths, failed attempts, verification state, and next action recoverable after compact/resume.
+> `/goal` Harden this release over a long-running session. Use goalkeeper.
 
 但 skill activation 仍然是 routing decision，不是私有的 agent runtime hook。Goalkeeper 不能强制自己附着到每一个 goal。
 
 对于重要的长期任务，最稳妥的做法是在创建 goal 时，或创建 goal 后正式开始工作前，明确调用它：
 
-> Use goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
+> Use goalkeeper for this goal.
 
-之后用户不需要手动执行 Goalkeeper 的 helper scripts。agent 会把它们作为 skill workflow 的一部分来运行。
+用户需要记住的句子到这里就够了。checkpoint、context pack、event log、失败尝试、验证状态和 helper scripts，都由 agent 在 Goalkeeper workflow 中处理。
 
 ## 问题
 
@@ -57,15 +57,15 @@ npx skills add deltafleet/goalkeeper --agent claude-code codex
 
 想象一个真实会话：
 
-1. 你让 agent 做 release hardening。
-2. 最显眼的 patch 能修掉眼前的 bug，但会破坏 rollback compatibility。
-3. 你设下硬约束：不能改 database schema，必须保持 backward compatibility。
-4. 第二次尝试通过了 unit tests，但在 integration edge case 上失败。
-5. agent 选择 compatibility shim 加 targeted regression test。
-6. regression test 通过了。这条路线现在是安全路线。
+1. 你让 agent 修一个支付 bug。
+2. 早期调查发现，`refunds` 相关代码是 legacy，不能轻易动。
+3. 最快的 patch 是直接改 `refunds`，所以你明确拒绝这条路。
+4. agent 尝试把修复放到 webhook handler，但 duplicate event 场景会失败。
+5. 最后它验证了安全路线：在 service layer 加 idempotency guard，并用 regression test 覆盖。
+6. 测试通过了。这条路线现在是需要保留下来的安全路线。
 7. 上下文被 compact。
-8. 后来 agent 带着整洁摘要回来：“release hardening 基本完成。”
-9. 它还记得 goal，但可能不再清楚为什么 schema shortcut 必须继续禁止，为什么前几个 patch 失败，以及为什么那个 regression test 很关键。
+8. 后来 agent 带着整洁摘要回来：“支付 bug 基本修好了。”
+9. 它还记得 goal，但可能不再清楚 `refunds` 为什么不能动，webhook 尝试为什么失败，以及 service-layer test 为什么证明了正确路线。
 
 drift 就从这里开始。
 

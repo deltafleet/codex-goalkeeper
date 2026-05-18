@@ -39,15 +39,15 @@ Skill-compatible agent는 설치된 skill 중 요청과 관련성이 높은 skil
 
 그래서 아래처럼 goal 자체가 충분히 분명하면 자동으로 붙을 수 있습니다.
 
-> `/goal` 이번 릴리스를 장기 세션으로 안정화해줘. compact/resume 이후에도 목표, 제약, 거부한 경로, 실패한 시도, 검증 상태, 다음 액션이 복구 가능하게 관리해줘.
+> `/goal` 이번 릴리스를 장기 세션으로 안정화해줘. goalkeeper를 사용해줘.
 
 하지만 skill 활성화는 agent runtime hook이 아니라 routing 판단입니다. Goalkeeper가 모든 goal에 자신을 강제로 붙일 수는 없습니다.
 
 중요한 장기 작업이라면 goal을 만들 때, 또는 goal을 만든 직후 본격 작업 전에 명시적으로 호출하는 편이 가장 안전합니다.
 
-> 이 `/goal`에는 goalkeeper를 사용해줘. 목표, 제약, 결정, 검증 상태, 실패한 시도, 다음 액션이 compact 이후에도 복구 가능하게 관리해줘.
+> 이 goal에는 goalkeeper를 사용해줘.
 
-그 다음부터 사용자가 Goalkeeper의 helper script를 직접 실행할 필요는 없습니다. agent가 skill workflow의 일부로 실행합니다.
+사용자가 기억할 문장은 여기까지입니다. checkpoint, context pack, event log, 실패한 시도, 검증 상태, helper script 같은 것은 Goalkeeper workflow 안에서 agent가 관리합니다.
 
 ## 문제
 
@@ -57,15 +57,15 @@ Skill-compatible agent는 설치된 skill 중 요청과 관련성이 높은 skil
 
 실제 세션을 상상해보면 이렇습니다.
 
-1. agent에게 릴리스 hardening을 맡깁니다.
-2. 가장 쉬운 patch는 눈앞의 bug는 고치지만 rollback compatibility를 깨뜨릴 수 있습니다.
-3. 사용자는 강한 제약을 둡니다. database schema는 바꾸지 말고, backward compatibility를 유지해야 합니다.
-4. 두 번째 시도는 unit test를 통과하지만 integration edge case에서 실패합니다.
-5. agent는 compatibility shim과 targeted regression test 조합으로 방향을 정합니다.
-6. regression test가 통과합니다. 이제 이 경로가 안전한 경로입니다.
+1. agent에게 결제 버그 수정을 맡깁니다.
+2. 초반 조사에서 `refunds` 쪽 코드는 레거시라 건드리면 안 된다는 사실이 드러납니다.
+3. 가장 빠른 patch는 `refunds`를 직접 고치는 방식이라, 사용자가 그 경로를 명시적으로 거부합니다.
+4. agent는 webhook handler 쪽으로 옮겨보지만, duplicate event 케이스에서 실패합니다.
+5. 결국 service layer에 idempotency guard를 두고 regression test로 막는 경로를 검증합니다.
+6. 테스트가 통과합니다. 이제 이 경로가 유지되어야 하는 안전한 경로입니다.
 7. 컨텍스트가 compact됩니다.
-8. 나중에 에이전트는 “release hardening은 거의 됨” 같은 깔끔한 요약으로 돌아옵니다.
-9. goal은 기억하지만, 왜 schema shortcut이 계속 금지되어야 하는지, 앞선 patch들이 왜 실패했는지, 그 regression test가 왜 중요한지는 희미해질 수 있습니다.
+8. 나중에 에이전트는 “결제 버그는 거의 해결됨” 같은 깔끔한 요약으로 돌아옵니다.
+9. goal은 기억하지만, `refunds`를 건드리면 안 된다는 점, webhook 시도가 실패했다는 점, service-layer test가 안전한 경로를 증명했다는 점은 희미해질 수 있습니다.
 
 여기서 drift가 시작됩니다.
 

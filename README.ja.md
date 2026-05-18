@@ -39,15 +39,15 @@ Skill-compatible agent は、リクエストが metadata と強く一致する i
 
 そのため、次のような goal だけで有効になることがあります。
 
-> `/goal` Harden this release over a long-running session. Keep the goal, constraints, rejected paths, failed attempts, verification state, and next action recoverable after compact/resume.
+> `/goal` Harden this release over a long-running session. Use goalkeeper.
 
 ただし skill activation は routing decision であり、private agent runtime hook ではありません。Goalkeeper がすべての goal に強制的に自分を適用することはできません。
 
 重要な長期作業では、goal を作る時点、または goal 作成直後で本格作業に入る前に、明示的に呼び出すのがもっとも安全です。
 
-> Use goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
+> Use goalkeeper for this goal.
 
-その後、ユーザーが Goalkeeper の helper script を手で実行する必要はありません。agent が skill workflow の一部として実行します。
+ユーザーが覚える必要がある文はここまでです。checkpoint、context pack、event log、失敗した試行、検証状態、helper script は、Goalkeeper workflow の中で agent が扱います。
 
 ## 問題
 
@@ -57,15 +57,15 @@ Skill-compatible agent は、リクエストが metadata と強く一致する i
 
 実際のセッションを想像してください。
 
-1. agent にリリース hardening を任せます。
-2. いちばん分かりやすい patch は目の前の bug を直しますが、rollback compatibility を壊す可能性があります。
-3. ユーザーは強い制約を置きます。database schema は変更せず、backward compatibility を維持する。
-4. 2 回目の試行は unit test を通りますが、integration edge case で失敗します。
-5. agent は compatibility shim と targeted regression test の組み合わせに決めます。
-6. regression test が通ります。このルートが安全なルートになります。
+1. agent に決済バグの修正を任せます。
+2. 早い段階で、`refunds` 周りのコードは legacy なので触るべきではないと分かります。
+3. 最速の patch は `refunds` を直接編集する方法なので、ユーザーはその方針を拒否します。
+4. agent は webhook handler 側に移そうとしますが、duplicate event のケースで失敗します。
+5. 最終的に service layer に idempotency guard を置き、regression test で検証するルートが通ります。
+6. テストが通ります。このルートが維持すべき安全なルートになります。
 7. コンテキストが compact されます。
-8. 後でエージェントは「release hardening はほぼ完了」というきれいな要約で戻ってきます。
-9. goal は残っています。しかし、なぜ schema shortcut を禁止し続ける必要があるのか、なぜ前の patch が失敗したのか、なぜその regression test が重要なのかは薄れているかもしれません。
+8. 後でエージェントは「決済バグはほぼ修正済み」というきれいな要約で戻ってきます。
+9. goal は残っています。しかし、`refunds` が触ってはいけない場所だったこと、webhook の試行が失敗したこと、service-layer test が安全なルートを証明したことは薄れているかもしれません。
 
 ここから drift が始まります。
 

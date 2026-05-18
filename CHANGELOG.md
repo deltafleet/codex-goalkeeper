@@ -4,6 +4,12 @@ All notable changes to Goalkeeper are documented here.
 
 This project follows [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] - 2026-05-18
+
+- Simplified public invocation copy to `Use goalkeeper for this goal.`
+- Rewrote the README problem example around a clearer long-session payment bug scenario.
+- Shortened the UI default prompt so users are not asked to spell out Goalkeeper internals.
+
 ## [0.2.0] - 2026-05-18
 
 - Renamed the public project to `goalkeeper`.

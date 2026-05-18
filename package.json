@@ -1,6 +1,6 @@
 {
   "name": "@deltafleet/goalkeeper",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A small Agent Skill for keeping long-running goals oriented across compaction, resumes, and handoffs.",
   "license": "MIT",
   "type": "module",

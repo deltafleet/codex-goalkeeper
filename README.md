@@ -39,15 +39,15 @@ Skill-compatible agents can automatically load installed skills when a request s
 
 So this can be enough:
 
-> `/goal` Harden this release over a long-running session. Keep the goal, constraints, rejected paths, failed attempts, verification state, and next action recoverable after compact/resume.
+> `/goal` Harden this release over a long-running session. Use goalkeeper.
 
 But skill activation is still a routing decision, not a private runtime hook. Goalkeeper cannot force itself onto every goal.
 
 For important long-running work, the safest path is to be explicit when you create the goal, or immediately after creating it:
 
-> Use goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
+> Use goalkeeper for this goal.
 
-After that, you should not have to run Goalkeeper's helper scripts yourself. The agent runs them as part of the skill workflow.
+That is the whole user-facing instruction. After that, you should not have to name the checkpoint, context pack, event log, failed attempts, verification state, or helper scripts yourself. The agent runs Goalkeeper as part of the skill workflow.
 
 ## The Problem
 
@@ -57,15 +57,15 @@ But long goals are different.
 
 Imagine a real session:
 
-1. You ask an agent to harden a release.
-2. The obvious patch fixes the visible bug, but would break rollback compatibility.
-3. You set a hard constraint: no database schema change, keep backward compatibility.
-4. A second attempt passes unit tests, but fails an integration edge case.
-5. The agent settles on a compatibility shim plus a targeted regression test.
-6. The regression test passes. That path is now the safe one.
+1. You ask an agent to fix a payment bug.
+2. Early in the work, it discovers `refunds` is legacy code and should not be touched.
+3. The quickest patch would edit `refunds`, so you reject that path.
+4. The agent tries moving the fix into a webhook handler, but duplicate events break it.
+5. It finally proves the safe route: put an idempotency guard in the service layer and cover it with a regression test.
+6. The test passes. That route is now the one you want preserved.
 7. The context compacts.
-8. Later, the agent resumes from a clean summary: "release hardening mostly done."
-9. It still knows the goal, but may no longer feel why the schema shortcut stayed forbidden, why the first patches failed, or why that regression test mattered.
+8. Later, the agent resumes from a clean summary: "payment bug mostly fixed."
+9. It still knows the goal, but may no longer remember that `refunds` was off-limits, that the webhook attempt failed, or that the service-layer test is what made the route safe.
 
 That is where drift starts.
 
