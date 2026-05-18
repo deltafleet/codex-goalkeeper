@@ -1,0 +1,5 @@
+interface:
+  display_name: "Codex Goalkeeper"
+  short_description: "Keep Codex goals oriented"
+  default_prompt: "Use $codex-goalkeeper for this /goal or long-running Codex task so checkpoint, context pack, and event log preserve direction across compaction."
+  brand_color: "#2563EB"

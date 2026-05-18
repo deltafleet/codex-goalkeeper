@@ -1,0 +1,58 @@
+{
+  "name": "@deltafleet/codex-goalkeeper",
+  "version": "0.1.1",
+  "description": "A small Codex skill for keeping long-running goals oriented across compaction, resumes, and handoffs.",
+  "license": "MIT",
+  "type": "module",
+  "homepage": "https://github.com/deltafleet/codex-goalkeeper#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deltafleet/codex-goalkeeper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/deltafleet/codex-goalkeeper/issues"
+  },
+  "keywords": [
+    "codex",
+    "codex-skill",
+    "ai-agents",
+    "context",
+    "compaction",
+    "checkpoint",
+    "goal"
+  ],
+  "bin": {
+    "codex-goalkeeper-init": "src/codex-goalkeeper/scripts/goalkeeper-init.mjs",
+    "codex-goalkeeper-turn-start": "src/codex-goalkeeper/scripts/goalkeeper-turn-start.mjs",
+    "codex-goalkeeper-append-event": "src/codex-goalkeeper/scripts/goalkeeper-append-event.mjs",
+    "codex-goalkeeper-update-checkpoint": "src/codex-goalkeeper/scripts/goalkeeper-update-checkpoint.mjs",
+    "codex-goalkeeper-doctor": "src/codex-goalkeeper/scripts/goalkeeper-doctor.mjs"
+  },
+  "files": [
+    "src/codex-goalkeeper",
+    "examples",
+    "docs",
+    "README.md",
+    "README.ko.md",
+    "README.ja.md",
+    "README.zh-CN.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "CODE_OF_CONDUCT.md"
+  ],
+  "scripts": {
+    "check:scripts": "find src/codex-goalkeeper/scripts tests -name '*.mjs' -print0 | xargs -0 -n1 node --check",
+    "test": "node tests/test-goalkeeper-update-checkpoint.mjs",
+    "validate:skill": "npx skills add . --list",
+    "validate:examples": "find examples -name '*.jsonl' -print0 | xargs -0 -n1 jq -c . >/dev/null",
+    "validate": "npm run check:scripts && npm test && npm run validate:examples && npm run validate:skill"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

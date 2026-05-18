@@ -1,0 +1,5 @@
+{"ts":"2026-05-17T00:00:00Z","type":"goal","text":"Ship a long-running Codex feature without losing direction after repeated compaction.","status":"open"}
+{"ts":"2026-05-17T00:01:00Z","type":"user_constraint","text":"The agent must read checkpoint.md before resuming after compaction."}
+{"ts":"2026-05-17T00:02:00Z","type":"decision","text":"Use .goalkeeper/sessions/<goal-session-id>/ for runtime state.","reason":"Separates multiple long-running goals within one project while keeping state local to the workspace."}
+{"ts":"2026-05-17T00:03:00Z","type":"failure","text":"Do not store full conversation summaries in checkpoint.md.","reason":"Long checkpoints defeat routine recovery because agents stop reading them carefully."}
+{"ts":"2026-05-17T00:04:00Z","type":"next_action","text":"Use the checkpoint to recover direction, then inspect event evidence only when exact details are needed.","status":"open"}
