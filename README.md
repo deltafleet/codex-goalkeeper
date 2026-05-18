@@ -29,11 +29,19 @@ npx skills add deltafleet/codex-goalkeeper
 
 Requirements: Node.js 18+ and `npx`. Codex uses the skill's bundled Node helper scripts during long-goal workflows.
 
-Then ask Codex to use it on long-running work:
+Codex can automatically load installed skills when a request strongly matches their metadata. Goalkeeper is written to match `/goal`, long-running work, compaction, resume, handoff, and continuity-preservation language.
+
+So this can be enough:
+
+> `/goal` Harden this release over a long-running session. Keep the goal, constraints, rejected paths, failed attempts, verification state, and next action recoverable after compact/resume.
+
+But skill activation is still a routing decision, not a private Codex runtime hook. Goalkeeper cannot force itself onto every goal.
+
+For important long-running work, the safest path is to be explicit when you create the goal, or immediately after creating it:
 
 > Use codex-goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
 
-That is the intended user workflow. You should not have to manually run Goalkeeper's helper scripts during normal use. Codex runs them as part of the skill workflow.
+After that, you should not have to run Goalkeeper's helper scripts yourself. Codex runs them as part of the skill workflow.
 
 ## The Problem
 
@@ -44,12 +52,14 @@ But long goals are different.
 Imagine a real session:
 
 1. You ask Codex to harden a release.
-2. It finds a brittle edge case and chooses a conservative path.
-3. You explicitly reject a tempting shortcut.
-4. Two implementation attempts fail for subtle reasons.
-5. A test finally proves the right route.
-6. The context compacts.
-7. Later, the agent resumes with a neat summary, but not the decision pressure that made the route correct.
+2. The obvious patch fixes the visible bug, but would break rollback compatibility.
+3. You set a hard constraint: no database schema change, keep backward compatibility.
+4. A second attempt passes unit tests, but fails an integration edge case.
+5. Codex settles on a compatibility shim plus a targeted regression test.
+6. The regression test passes. That path is now the safe one.
+7. The context compacts.
+8. Later, the agent resumes from a clean summary: "release hardening mostly done."
+9. It still knows the goal, but may no longer feel why the schema shortcut stayed forbidden, why the first patches failed, or why that regression test mattered.
 
 That is where drift starts.
 

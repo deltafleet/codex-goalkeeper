@@ -29,11 +29,19 @@ npx skills add deltafleet/codex-goalkeeper
 
 要件: Node.js 18+ と `npx`。長い goal workflow で、Codex は skill に同梱された Node helper script を使います。
 
-そして長い作業で Codex にこう依頼します。
+Codex は、リクエストが metadata と強く一致する installed skill を自動で読み込むことがあります。Goalkeeper の metadata は `/goal`、長い作業、compaction、resume、handoff、continuity preservation に反応するように書かれています。
+
+そのため、次のような goal だけで有効になることがあります。
+
+> `/goal` Harden this release over a long-running session. Keep the goal, constraints, rejected paths, failed attempts, verification state, and next action recoverable after compact/resume.
+
+ただし skill activation は routing decision であり、private Codex runtime hook ではありません。Goalkeeper がすべての goal に強制的に自分を適用することはできません。
+
+重要な長期作業では、goal を作る時点、または goal 作成直後で本格作業に入る前に、明示的に呼び出すのがもっとも安全です。
 
 > Use codex-goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
 
-通常の利用はここまでです。ユーザーが Goalkeeper の helper script を手で実行する必要はありません。Codex が skill workflow の一部として実行します。
+その後、ユーザーが Goalkeeper の helper script を手で実行する必要はありません。Codex が skill workflow の一部として実行します。
 
 ## 問題
 
@@ -44,12 +52,14 @@ npx skills add deltafleet/codex-goalkeeper
 実際のセッションを想像してください。
 
 1. Codex にリリース hardening を任せます。
-2. Codex は壊れやすい edge case を見つけ、保守的なルートを選びます。
-3. ユーザーは魅力的だが危険な shortcut を明示的に拒否します。
-4. 2 回の実装試行が微妙な理由で失敗します。
-5. あるテストがようやく正しいルートを証明します。
-6. コンテキストが compact されます。
-7. 後でエージェントはきれいな要約を持って戻りますが、そのルートが正しかった理由の圧力は薄れています。
+2. いちばん分かりやすい patch は目の前の bug を直しますが、rollback compatibility を壊す可能性があります。
+3. ユーザーは強い制約を置きます。database schema は変更せず、backward compatibility を維持する。
+4. 2 回目の試行は unit test を通りますが、integration edge case で失敗します。
+5. Codex は compatibility shim と targeted regression test の組み合わせに決めます。
+6. regression test が通ります。このルートが安全なルートになります。
+7. コンテキストが compact されます。
+8. 後でエージェントは「release hardening はほぼ完了」というきれいな要約で戻ってきます。
+9. goal は残っています。しかし、なぜ schema shortcut を禁止し続ける必要があるのか、なぜ前の patch が失敗したのか、なぜその regression test が重要なのかは薄れているかもしれません。
 
 ここから drift が始まります。
 

@@ -29,11 +29,19 @@ npx skills add deltafleet/codex-goalkeeper
 
 要求: Node.js 18+ 和 `npx`。在长 goal workflow 中，Codex 会使用 skill 内置的 Node helper scripts。
 
-然后在长任务里告诉 Codex：
+当请求和 metadata 高度匹配时，Codex 可以自动加载已安装的 skill。Goalkeeper 的 metadata 面向 `/goal`、长时间任务、compaction、resume、handoff 和 continuity preservation。
+
+所以像下面这样的 goal 可能已经足够触发它：
+
+> `/goal` Harden this release over a long-running session. Keep the goal, constraints, rejected paths, failed attempts, verification state, and next action recoverable after compact/resume.
+
+但 skill activation 仍然是 routing decision，不是私有的 Codex runtime hook。Goalkeeper 不能强制自己附着到每一个 goal。
+
+对于重要的长期任务，最稳妥的做法是在创建 goal 时，或创建 goal 后正式开始工作前，明确调用它：
 
 > Use codex-goalkeeper for this `/goal`. Keep the goal, constraints, decisions, verification state, failed attempts, and next action recoverable across compaction.
 
-正常使用到这里就够了。用户不需要手动执行 Goalkeeper 的 helper scripts。Codex 会把它们作为 skill workflow 的一部分来运行。
+之后用户不需要手动执行 Goalkeeper 的 helper scripts。Codex 会把它们作为 skill workflow 的一部分来运行。
 
 ## 问题
 
@@ -44,12 +52,14 @@ npx skills add deltafleet/codex-goalkeeper
 想象一个真实会话：
 
 1. 你让 Codex 做 release hardening。
-2. Codex 找到一个脆弱的 edge case，并选择保守路线。
-3. 你明确拒绝了一个看起来诱人但危险的 shortcut。
-4. 两次实现尝试因为微妙原因失败。
-5. 一个测试终于证明了正确路线。
-6. 上下文被 compact。
-7. 后来 agent 带着整洁摘要回来，但当初为什么这个路线正确的压力已经变淡了。
+2. 最显眼的 patch 能修掉眼前的 bug，但会破坏 rollback compatibility。
+3. 你设下硬约束：不能改 database schema，必须保持 backward compatibility。
+4. 第二次尝试通过了 unit tests，但在 integration edge case 上失败。
+5. Codex 选择 compatibility shim 加 targeted regression test。
+6. regression test 通过了。这条路线现在是安全路线。
+7. 上下文被 compact。
+8. 后来 agent 带着整洁摘要回来：“release hardening 基本完成。”
+9. 它还记得 goal，但可能不再清楚为什么 schema shortcut 必须继续禁止，为什么前几个 patch 失败，以及为什么那个 regression test 很关键。
 
 drift 就从这里开始。
 

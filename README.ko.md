@@ -29,11 +29,19 @@ npx skills add deltafleet/codex-goalkeeper
 
 요구사항: Node.js 18+와 `npx`. 긴 goal workflow에서 Codex가 skill에 포함된 Node helper script를 사용합니다.
 
-그리고 긴 작업에서 Codex에게 이렇게 요청합니다.
+Codex는 설치된 skill 중 요청과 관련성이 높은 skill을 자동으로 불러올 수 있습니다. Goalkeeper의 metadata는 `/goal`, 긴 작업, compact, resume, handoff, continuity 보존 신호에 반응하도록 작성되어 있습니다.
+
+그래서 아래처럼 goal 자체가 충분히 분명하면 자동으로 붙을 수 있습니다.
+
+> `/goal` 이번 릴리스를 장기 세션으로 안정화해줘. compact/resume 이후에도 목표, 제약, 거부한 경로, 실패한 시도, 검증 상태, 다음 액션이 복구 가능하게 관리해줘.
+
+하지만 skill 활성화는 Codex runtime hook이 아니라 routing 판단입니다. Goalkeeper가 모든 goal에 자신을 강제로 붙일 수는 없습니다.
+
+중요한 장기 작업이라면 goal을 만들 때, 또는 goal을 만든 직후 본격 작업 전에 명시적으로 호출하는 편이 가장 안전합니다.
 
 > 이 `/goal`에는 codex-goalkeeper를 사용해줘. 목표, 제약, 결정, 검증 상태, 실패한 시도, 다음 액션이 compact 이후에도 복구 가능하게 관리해줘.
 
-정상적인 사용 흐름은 여기까지입니다. 사용자가 Goalkeeper의 helper script를 직접 실행할 필요는 없습니다. Codex가 skill workflow의 일부로 실행합니다.
+그 다음부터 사용자가 Goalkeeper의 helper script를 직접 실행할 필요는 없습니다. Codex가 skill workflow의 일부로 실행합니다.
 
 ## 문제
 
@@ -44,12 +52,14 @@ npx skills add deltafleet/codex-goalkeeper
 실제 세션을 상상해보면 이렇습니다.
 
 1. Codex에게 릴리스 hardening을 맡깁니다.
-2. Codex가 취약한 edge case를 발견하고 보수적인 경로를 선택합니다.
-3. 사용자는 그럴듯하지만 위험한 shortcut을 명시적으로 금지합니다.
-4. 두 번의 구현 시도가 미묘한 이유로 실패합니다.
-5. 어떤 테스트가 드디어 올바른 경로를 증명합니다.
-6. 컨텍스트가 compact됩니다.
-7. 나중에 에이전트가 깔끔한 요약을 들고 돌아오지만, 왜 그 경로가 맞았는지에 대한 압력은 희미해져 있습니다.
+2. 가장 쉬운 patch는 눈앞의 bug는 고치지만 rollback compatibility를 깨뜨릴 수 있습니다.
+3. 사용자는 강한 제약을 둡니다. database schema는 바꾸지 말고, backward compatibility를 유지해야 합니다.
+4. 두 번째 시도는 unit test를 통과하지만 integration edge case에서 실패합니다.
+5. Codex는 compatibility shim과 targeted regression test 조합으로 방향을 정합니다.
+6. regression test가 통과합니다. 이제 이 경로가 안전한 경로입니다.
+7. 컨텍스트가 compact됩니다.
+8. 나중에 에이전트는 “release hardening은 거의 됨” 같은 깔끔한 요약으로 돌아옵니다.
+9. goal은 기억하지만, 왜 schema shortcut이 계속 금지되어야 하는지, 앞선 patch들이 왜 실패했는지, 그 regression test가 왜 중요한지는 희미해질 수 있습니다.
 
 여기서 drift가 시작됩니다.
 
